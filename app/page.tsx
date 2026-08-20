@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { authClient } from '@/lib/auth-client'
 import {
   ArrowUp, Bell, BookOpen, ChevronDown, CircleHelp, Headphones, Heart,
   Home, LifeBuoy, Menu, Mic, MoreHorizontal, Music2, Paperclip, Play,
@@ -32,6 +34,7 @@ export default function Page() {
   const [listening, setListening] = useState(false)
   const [panel, setPanel] = useState<'settings' | 'safety' | null>(null)
   const [mobileNav, setMobileNav] = useState(false)
+  const { data: session } = authClient.useSession()
 
   function sendMessage(value = draft) {
     const text = value.trim()
@@ -58,7 +61,7 @@ export default function Page() {
         <div className="side-bottom">
           <button className="nav-item" onClick={() => setPanel('safety')}><ShieldCheck data-icon="inline-start" /> Safety & privacy</button>
           <button className="nav-item" onClick={() => setPanel('settings')}><Settings data-icon="inline-start" /> Settings</button>
-          <div className="profile"><div className="avatar">A</div><div><strong>Alex Morgan</strong><span>Member since 2024</span></div><MoreHorizontal /></div>
+          <div className="profile"><div className="avatar">{session?.user?.name?.slice(0, 1) ?? 'A'}</div><div><strong>{session?.user?.name ?? 'Guest explorer'}</strong><span>{session?.user ? 'Member space' : 'Sign in to save history'}</span></div><MoreHorizontal /></div>
         </div>
       </aside>
 
@@ -66,7 +69,7 @@ export default function Page() {
         <header className="topbar">
           <button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setMobileNav(!mobileNav)}><Menu /></button>
           <div className="mobile-brand"><CompanionMark /><strong>BhaavaBot</strong></div>
-          <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Bell /></button><div className="online"><i /> Online</div></div>
+          <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Bell /></button>{session?.user ? <button className="account-link" onClick={() => authClient.signOut()}>Sign out</button> : <Link className="account-link" href="/sign-in">Sign in</Link>}<div className="online"><i /> Online</div></div>
         </header>
         <div className="conversation-inner">
           <div className="conversation-heading"><div><p className="eyebrow">TUESDAY, AUGUST 21</p><h1>How are you feeling today?</h1><p className="subheading">Take a breath. There’s no rush here.</p></div><button className="help-button"><CircleHelp /> <span>Need help?</span></button></div>
