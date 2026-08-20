@@ -22,8 +22,37 @@ const initialMessages = [
   { from: 'bot', text: 'That sounds like a lot to carry. You don’t have to solve everything at once. Would it help to talk through what feels heaviest right now?', time: '10:43 AM' },
 ]
 
+const musicItems = [
+  { title: 'Quiet corners', artist: 'BhaavaBot sessions', kind: 'Focus · 42 min', icon: '◒', tone: 'mint' },
+  { title: 'Soft landing', artist: 'The Sunday Room', kind: 'Ambient · 38 min', icon: '◌', tone: 'lavender' },
+  { title: 'A little lighter', artist: 'Mira Sol', kind: 'Acoustic · 31 min', icon: '☼', tone: 'peach' },
+  { title: 'Evening tea', artist: 'Low Tide Club', kind: 'Lo-fi · 46 min', icon: '♪', tone: 'blue' },
+]
+
+const movieItems = [
+  { title: 'Paterson', year: '2016', kind: 'Quiet · Tender', icon: 'P', tone: 'lavender' },
+  { title: 'Perfect Days', year: '2023', kind: 'Gentle · Observant', icon: 'PD', tone: 'mint' },
+  { title: 'The Secret Life of Walter Mitty', year: '2013', kind: 'Hopeful · Warm', icon: 'W', tone: 'peach' },
+  { title: 'Kiki’s Delivery Service', year: '1989', kind: 'Comforting · Bright', icon: 'K', tone: 'blue' },
+]
+
 function CompanionMark() {
   return <div className="companion-mark" aria-hidden="true"><span /><span /><span /></div>
+}
+
+function MediaView({ type, filter, setFilter, activeMedia, setActiveMedia, favorites, setFavorites }: { type: string; filter: string; setFilter: (filter: string) => void; activeMedia: string | null; setActiveMedia: (title: string | null) => void; favorites: string[]; setFavorites: (items: string[]) => void }) {
+  const isMusic = type === 'Music'
+  const items = isMusic ? musicItems : movieItems
+  const filters = isMusic ? ['For you', 'Focus', 'Sleep', 'Uplift'] : ['For you', 'Comfort', 'Thoughtful', 'Light']
+  const featured = items[0]
+  const toggleFavorite = (title: string) => setFavorites(favorites.includes(title) ? favorites.filter((item) => item !== title) : [...favorites, title])
+  return <div className="media-view">
+    <div className={`media-hero ${isMusic ? 'music-hero' : 'movie-hero'}`}><div><span className="media-kicker">{isMusic ? 'A gentle listen' : 'A thoughtful watch'}</span><h2>{isMusic ? 'Let the room get quieter.' : 'Something kind for tonight.'}</h2><p>{isMusic ? 'A small collection for the moments when you want less noise.' : 'Stories with a little warmth, a little wonder, and no rush to get anywhere.'}</p><button className="media-primary" onClick={() => setActiveMedia(featured.title)}>{isMusic ? <Play /> : <Film />}{activeMedia === featured.title ? 'Playing now' : isMusic ? 'Start listening' : 'View recommendation'}</button></div><div className="feature-art"><span>{featured.icon}</span><small>{isMusic ? 'BHAAVABOT' : 'TONIGHT'}</small></div></div>
+    <div className="media-toolbar"><div className="filter-row">{filters.map((item) => <button key={item} className={filter === item ? 'filter-chip active' : 'filter-chip'} onClick={() => setFilter(item)}>{item}</button>)}</div><button className="media-library" onClick={() => setFilter(isMusic ? 'Saved' : 'My list')}><Heart /> {isMusic ? 'Saved' : 'My list'}</button></div>
+    <div className="media-section-heading"><div><span className="eyebrow">CURATED FOR YOU</span><h3>{isMusic ? 'A softer soundtrack' : 'A warm little watchlist'}</h3></div><span className="media-count">{items.length} picks</span></div>
+    <div className="media-grid">{items.map((item) => <article className="media-card" key={item.title}><button className={`cover-art ${item.tone}`} onClick={() => setActiveMedia(item.title)} aria-label={`${isMusic ? 'Play' : 'Open'} ${item.title}`}><span>{item.icon}</span><i>{isMusic ? <Play /> : <Film />}</i></button><div className="media-card-body"><div><h4>{item.title}</h4><p>{isMusic ? item.artist : item.year}</p><small>{item.kind}</small></div><button className={favorites.includes(item.title) ? 'favorite active' : 'favorite'} onClick={() => toggleFavorite(item.title)} aria-label={`Save ${item.title}`}><Heart /></button></div></article>)}</div>
+    {activeMedia && <div className="now-playing"><div className="now-playing-mark">{isMusic ? <Music2 /> : <Film />}</div><div><strong>{activeMedia}</strong><span>{isMusic ? 'Now playing · breathe easy' : 'Selected for your evening'}</span></div><button onClick={() => setActiveMedia(null)} aria-label="Close selection"><X /></button></div>}
+  </div>
 }
 
 export default function Page() {
@@ -34,6 +63,9 @@ export default function Page() {
   const [listening, setListening] = useState(false)
   const [panel, setPanel] = useState<'settings' | 'safety' | null>(null)
   const [mobileNav, setMobileNav] = useState(false)
+  const [activeMedia, setActiveMedia] = useState<string | null>(null)
+  const [favorites, setFavorites] = useState<string[]>([])
+  const [mediaFilter, setMediaFilter] = useState('For you')
   const { data: session } = authClient.useSession()
 
   function sendMessage(value = draft) {
@@ -76,13 +108,15 @@ export default function Page() {
           <div className="mode-switcher" aria-label="Conversation mode">
             {(['Chat', 'Music', 'Movies'] as const).map((item) => <button key={item} className={mode === item ? 'mode active' : 'mode'} onClick={() => setMode(item)}>{item === 'Chat' ? <Sparkles /> : item === 'Music' ? <Music2 /> : <Film />}{item}</button>)}
           </div>
-          <div className="message-area" aria-live="polite">
-            {messages.length === 0 ? <div className="empty-state"><div className="empty-orb"><CompanionMark /></div><h2>A fresh start</h2><p>What would you like to explore together?</p></div> : messages.map((message, index) => <div className={`message-row ${message.from}`} key={`${message.time}-${index}`}><div className="message-avatar">{message.from === 'bot' ? <CompanionMark /> : 'A'}</div><div className="message-content"><div className="message-bubble">{message.text}</div><span className="message-time">{message.time}</span></div></div>)}
-            {thinking && <div className="message-row bot"><div className="message-avatar"><CompanionMark /></div><div className="thinking"><i /><i /><i /></div></div>}
-          </div>
-          {messages.length > 0 && <div className="quick-prompts"><span>Try asking</span>{starters.slice(0, 3).map((item) => <button key={item.title} onClick={() => sendMessage(item.text)}>{item.icon} {item.title}</button>)}</div>}
-          {messages.length === 0 && <div className="starter-grid">{starters.map((item) => <button key={item.title} className="starter-card" onClick={() => sendMessage(item.text)}><b>{item.icon}</b><span>{item.title}</span><small>{item.text}</small><ArrowUp /></button>)}</div>}
-          <div className="composer-wrap"><div className="composer"><button className="composer-icon" aria-label="Attach file"><Paperclip /></button><input value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) sendMessage() }} placeholder="Share what’s on your mind..." aria-label="Message BhaavaBot"/><button className={`mic-button ${listening ? 'listening' : ''}`} aria-label="Use voice input" onClick={() => setListening(!listening)}>{listening ? <Square /> : <Mic />}</button><button className="send-button" aria-label="Send message" onClick={() => sendMessage()}><Send /></button></div><p className="composer-note"><ShieldCheck /> Your conversations are private and secure</p></div>
+          {mode === 'Chat' ? <>
+            <div className="message-area" aria-live="polite">
+              {messages.length === 0 ? <div className="empty-state"><div className="empty-orb"><CompanionMark /></div><h2>A fresh start</h2><p>What would you like to explore together?</p></div> : messages.map((message, index) => <div className={`message-row ${message.from}`} key={`${message.time}-${index}`}><div className="message-avatar">{message.from === 'bot' ? <CompanionMark /> : 'A'}</div><div className="message-content"><div className="message-bubble">{message.text}</div><span className="message-time">{message.time}</span></div></div>)}
+              {thinking && <div className="message-row bot"><div className="message-avatar"><CompanionMark /></div><div className="thinking"><i /><i /><i /></div></div>}
+            </div>
+            {messages.length > 0 && <div className="quick-prompts"><span>Try asking</span>{starters.slice(0, 3).map((item) => <button key={item.title} onClick={() => sendMessage(item.text)}>{item.icon} {item.title}</button>)}</div>}
+            {messages.length === 0 && <div className="starter-grid">{starters.map((item) => <button key={item.title} className="starter-card" onClick={() => sendMessage(item.text)}><b>{item.icon}</b><span>{item.title}</span><small>{item.text}</small><ArrowUp /></button>)}</div>}
+            <div className="composer-wrap"><div className="composer"><button className="composer-icon" aria-label="Attach file"><Paperclip /></button><input value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) sendMessage() }} placeholder="Share what’s on your mind..." aria-label="Message BhaavaBot"/><button className={`mic-button ${listening ? 'listening' : ''}`} aria-label="Use voice input" onClick={() => setListening(!listening)}>{listening ? <Square /> : <Mic />}</button><button className="send-button" aria-label="Send message" onClick={() => sendMessage()}><Send /></button></div><p className="composer-note"><ShieldCheck /> Your conversations are private and secure</p></div>
+          </> : <MediaView type={mode} filter={mediaFilter} setFilter={setMediaFilter} activeMedia={activeMedia} setActiveMedia={setActiveMedia} favorites={favorites} setFavorites={setFavorites} />}
         </div>
       </section>
       <div className={`scrim ${mobileNav ? 'visible' : ''}`} onClick={() => setMobileNav(false)} />
