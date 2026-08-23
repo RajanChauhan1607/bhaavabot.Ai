@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type React from 'react'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
 import {
@@ -55,8 +56,21 @@ function MediaView({ type, filter, setFilter, activeMedia, setActiveMedia, favor
   </div>
 }
 
+function HomeDashboard({ isNew, onStart }: { isNew: boolean; onStart: () => void }) {
+  return <div className="home-dashboard"><div className="welcome-card"><div><span className="eyebrow">A MOMENT FOR YOU</span><h2>{isNew ? 'Start wherever you are.' : 'Welcome back, Alex.'}</h2><p>{isNew ? 'There is no right way to begin. Just share one small thought.' : 'You have made it here. That is already something.'}</p></div><div className="welcome-sun">☼</div></div><div className="checkin-card"><div><span className="eyebrow">DAILY CHECK-IN</span><h3>What is your inner weather today?</h3><p>Choose a word, or simply notice what is here.</p></div><div className="mood-row">{['Calm', 'Tired', 'Heavy', 'Hopeful'].map((mood) => <button key={mood} onClick={onStart}>{mood}</button>)}</div></div><div className="home-section"><div className="section-title"><span className="eyebrow">A SMALL STEP</span><span>2 min</span></div><button className="reflection-prompt" onClick={onStart}><div className="prompt-icon"><Sparkles /></div><div><strong>Put it into words</strong><p>What has been taking up space in your mind?</p></div><ArrowUp /></button></div></div>
+}
+
+function ResourcesView(props: Omit<React.ComponentProps<typeof MediaView>, 'type'>) {
+  const [category, setCategory] = useState<'Music' | 'Movies'>('Music')
+  return <div className="resources-view"><div className="resources-intro"><span className="eyebrow">A PLACE TO UNWIND</span><h2>Resources</h2><p>Choose something gentle for the feeling you are carrying.</p></div><div className="resource-category"><button className={category === 'Music' ? 'category active' : 'category'} onClick={() => setCategory('Music')}><Music2 /><span><strong>Music</strong><small>For your mood</small></span></button><button className={category === 'Movies' ? 'category active' : 'category'} onClick={() => setCategory('Movies')}><Film /><span><strong>Movies</strong><small>For your evening</small></span></button></div><MediaView {...props} type={category} /></div>
+}
+
+function ReflectionsView() { return <div className="simple-page"><span className="eyebrow">YOUR INNER WORLD</span><h2>My reflections</h2><p>Your check-ins and saved thoughts will live here.</p><div className="empty-reflection"><Heart /><strong>A clear page can be a kind beginning.</strong><span>Start a new conversation to capture a reflection.</span></div></div> }
+function ProfileView({ onSettings, onSafety }: { onSettings: () => void; onSafety: () => void }) { return <div className="simple-page"><span className="eyebrow">YOUR SPACE</span><h2>Profile</h2><p>Make BhaavaBot feel right for you.</p><button className="profile-action" onClick={onSettings}><Settings /><span><strong>Settings</strong><small>Preferences and reminders</small></span><ChevronDown /></button><button className="profile-action" onClick={onSafety}><ShieldCheck /><span><strong>Safety & privacy</strong><small>Learn how your space stays private</small></span><ChevronDown /></button></div> }
+
 export default function Page() {
   const [mode, setMode] = useState('Chat')
+  const [view, setView] = useState<'home' | 'reflections' | 'new' | 'resources' | 'profile'>('home')
   const [messages, setMessages] = useState(initialMessages)
   const [draft, setDraft] = useState('')
   const [thinking, setThinking] = useState(false)
@@ -103,11 +117,10 @@ export default function Page() {
           <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Bell /></button>{session?.user ? <button className="account-link" onClick={() => authClient.signOut()}>Sign out</button> : <Link className="account-link" href="/sign-in">Sign in</Link>}</div>
         </header>
         <div className="conversation-inner">
-          <div className="conversation-heading"><div><p className="eyebrow">TUESDAY, AUGUST 21</p><h1>How are you feeling today?</h1><p className="subheading">Take a breath. There’s no rush here.</p></div><button className="help-button"><CircleHelp /> <span>Need help?</span></button></div>
-          <div className="mode-switcher" aria-label="Conversation mode">
-            {(['Chat', 'Music', 'Movies'] as const).map((item) => <button key={item} className={mode === item ? 'mode active' : 'mode'} onClick={() => setMode(item)}>{item === 'Chat' ? <Sparkles /> : item === 'Music' ? <Music2 /> : <Film />}{item}</button>)}
-          </div>
-          {mode === 'Chat' ? <>
+          <div className="conversation-heading"><div><p className="eyebrow">TUESDAY, AUGUST 21</p><h1>{view === 'resources' ? 'Find something that feels good.' : view === 'reflections' ? 'Notice what has changed.' : view === 'profile' ? 'Your calm space.' : 'How are you feeling today?'}</h1><p className="subheading">{view === 'resources' ? 'Music and movies, chosen with care.' : 'Take a breath. There’s no rush here.'}</p></div><button className="help-button"><CircleHelp /> <span>Need help?</span></button></div>
+          {view === 'home' || view === 'new' ? <>
+            <HomeDashboard isNew={view === 'new'} onStart={() => { setView('new'); setMessages([]) }} />
+            <div className="conversation-label"><Sparkles /> CONVERSATION</div>
             <div className="message-area" aria-live="polite">
               {messages.length === 0 ? <div className="empty-state"><div className="empty-orb"><CompanionMark /></div><h2>A fresh start</h2><p>What would you like to explore together?</p></div> : messages.map((message, index) => <div className={`message-row ${message.from}`} key={`${message.time}-${index}`}><div className="message-avatar">{message.from === 'bot' ? <CompanionMark /> : 'A'}</div><div className="message-content"><div className="message-bubble">{message.text}</div><span className="message-time">{message.time}</span></div></div>)}
               {thinking && <div className="message-row bot"><div className="message-avatar"><CompanionMark /></div><div className="thinking"><i /><i /><i /></div></div>}
@@ -115,15 +128,15 @@ export default function Page() {
             {messages.length > 0 && <div className="quick-prompts"><span>Try asking</span>{starters.slice(0, 3).map((item) => <button key={item.title} onClick={() => sendMessage(item.text)}>{item.icon} {item.title}</button>)}</div>}
             {messages.length === 0 && <div className="starter-grid">{starters.map((item) => <button key={item.title} className="starter-card" onClick={() => sendMessage(item.text)}><b>{item.icon}</b><span>{item.title}</span><small>{item.text}</small><ArrowUp /></button>)}</div>}
             <div className="composer-wrap"><div className="composer"><button className="composer-icon" aria-label="Attach file"><Paperclip /></button><input value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) sendMessage() }} placeholder="Share what’s on your mind..." aria-label="Message BhaavaBot"/><button className={`mic-button ${listening ? 'listening' : ''}`} aria-label="Use voice input" onClick={() => setListening(!listening)}>{listening ? <Square /> : <Mic />}</button><button className="send-button" aria-label="Send message" onClick={() => sendMessage()}><Send /></button></div><p className="composer-note"><ShieldCheck /> Your conversations are private and secure</p></div>
-          </> : <MediaView type={mode} filter={mediaFilter} setFilter={setMediaFilter} activeMedia={activeMedia} setActiveMedia={setActiveMedia} favorites={favorites} setFavorites={setFavorites} />}
+          </> : view === 'resources' ? <ResourcesView filter={mediaFilter} setFilter={setMediaFilter} activeMedia={activeMedia} setActiveMedia={setActiveMedia} favorites={favorites} setFavorites={setFavorites} /> : view === 'reflections' ? <ReflectionsView /> : <ProfileView onSettings={() => setPanel('settings')} onSafety={() => setPanel('safety')} />}
         </div>
       </section>
       <nav className="bottom-nav" aria-label="Primary navigation">
-        <button className="bottom-nav-item active" onClick={() => { setMode('Chat'); setMessages(initialMessages) }}><Home /><span>Home</span></button>
-        <button className="bottom-nav-item" onClick={() => setMessages([])}><Heart /><span>My reflections</span></button>
-        <button className="bottom-nav-new" onClick={() => { setMode('Chat'); setMessages([]) }} aria-label="New conversation"><Plus /><span>New</span></button>
-        <button className="bottom-nav-item" onClick={() => setMode('Movies')}><BookOpen /><span>Resources</span></button>
-        <button className="bottom-nav-item" onClick={() => setPanel('settings')}><div className="bottom-avatar">{session?.user?.name?.slice(0, 1) ?? 'A'}</div><span>Profile</span></button>
+        <button className={`bottom-nav-item ${view === 'home' ? 'active' : ''}`} onClick={() => setView('home')}><Home /><span>Home</span></button>
+        <button className={`bottom-nav-item ${view === 'reflections' ? 'active' : ''}`} onClick={() => setView('reflections')}><Heart /><span>My reflections</span></button>
+        <button className="bottom-nav-new" onClick={() => { setView('new'); setMessages([]) }} aria-label="New conversation"><Plus /><span>New</span></button>
+        <button className={`bottom-nav-item ${view === 'resources' ? 'active' : ''}`} onClick={() => setView('resources')}><BookOpen /><span>Resources</span></button>
+        <button className={`bottom-nav-item ${view === 'profile' ? 'active' : ''}`} onClick={() => setView('profile')}><div className="bottom-avatar">{session?.user?.name?.slice(0, 1) ?? 'A'}</div><span>Profile</span></button>
       </nav>
       <div className={`scrim ${mobileNav ? 'visible' : ''}`} onClick={() => setMobileNav(false)} />
       {listening && <div className="voice-toast"><div className="voice-pulse"><Mic /></div><div><strong>Listening...</strong><span>Tell me what’s on your mind</span></div><button onClick={() => setListening(false)} aria-label="Stop listening"><Square /></button></div>}
