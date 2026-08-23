@@ -99,9 +99,8 @@ export default function Page() {
 
       <section className="conversation">
         <header className="topbar">
-          <button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setMobileNav(!mobileNav)}><Menu /></button>
           <div className="mobile-brand"><CompanionMark /><strong>BhaavaBot</strong></div>
-          <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Bell /></button>{session?.user ? <button className="account-link" onClick={() => authClient.signOut()}>Sign out</button> : <Link className="account-link" href="/sign-in">Sign in</Link>}<div className="online"><i /> Online</div></div>
+          <div className="top-actions"><button className="icon-button" aria-label="Notifications"><Bell /></button>{session?.user ? <button className="account-link" onClick={() => authClient.signOut()}>Sign out</button> : <Link className="account-link" href="/sign-in">Sign in</Link>}</div>
         </header>
         <div className="conversation-inner">
           <div className="conversation-heading"><div><p className="eyebrow">TUESDAY, AUGUST 21</p><h1>How are you feeling today?</h1><p className="subheading">Take a breath. There’s no rush here.</p></div><button className="help-button"><CircleHelp /> <span>Need help?</span></button></div>
@@ -119,6 +118,13 @@ export default function Page() {
           </> : <MediaView type={mode} filter={mediaFilter} setFilter={setMediaFilter} activeMedia={activeMedia} setActiveMedia={setActiveMedia} favorites={favorites} setFavorites={setFavorites} />}
         </div>
       </section>
+      <nav className="bottom-nav" aria-label="Primary navigation">
+        <button className="bottom-nav-item active" onClick={() => { setMode('Chat'); setMessages(initialMessages) }}><Home /><span>Home</span></button>
+        <button className="bottom-nav-item" onClick={() => setMessages([])}><Heart /><span>My reflections</span></button>
+        <button className="bottom-nav-new" onClick={() => { setMode('Chat'); setMessages([]) }} aria-label="New conversation"><Plus /><span>New</span></button>
+        <button className="bottom-nav-item" onClick={() => setMode('Movies')}><BookOpen /><span>Resources</span></button>
+        <button className="bottom-nav-item" onClick={() => setPanel('settings')}><div className="bottom-avatar">{session?.user?.name?.slice(0, 1) ?? 'A'}</div><span>Profile</span></button>
+      </nav>
       <div className={`scrim ${mobileNav ? 'visible' : ''}`} onClick={() => setMobileNav(false)} />
       {listening && <div className="voice-toast"><div className="voice-pulse"><Mic /></div><div><strong>Listening...</strong><span>Tell me what’s on your mind</span></div><button onClick={() => setListening(false)} aria-label="Stop listening"><Square /></button></div>}
       {panel && <div className="panel-backdrop" onClick={() => setPanel(null)}><section className="info-panel" onClick={(event) => event.stopPropagation()}><button className="close-panel" onClick={() => setPanel(null)} aria-label="Close"><X /></button>{panel === 'settings' ? <><Settings className="panel-icon" /><h2>Your settings</h2><p>Choose the way BhaavaBot shows up for you. Your preferences are saved on this device.</p><label className="setting-row"><span>Gentle reminders</span><input type="checkbox" defaultChecked /></label><label className="setting-row"><span>Sound effects</span><input type="checkbox" /></label></> : <><ShieldCheck className="panel-icon" /><h2>A safe space</h2><p>BhaavaBot is here to support reflection, not replace professional care. Your conversations stay private and you can clear them anytime.</p><button className="panel-action" onClick={() => setPanel(null)}>I understand</button></>}</section></div>}
