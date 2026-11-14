@@ -1,0 +1,38 @@
+# ── Secrets & environment files ──────────────────────────────────────────────
+backend/.env
+bhaavabot.Ai/.env.local
+bhaavabot.Ai/.env
+*.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+backend/.venv/
+backend/venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+backend/requirements_full.txt
+
+# ── Node / Next.js ────────────────────────────────────────────────────────────
+bhaavabot.Ai/node_modules/
+bhaavabot.Ai/.next/
+bhaavabot.Ai/out/
+
+# ── Android ───────────────────────────────────────────────────────────────────
+bhaavabot.Ai/android/.gradle/
+bhaavabot.Ai/android/app/build/
+bhaavabot.Ai/android/build/
+bhaavabot.Ai/android/local.properties
+*.apk
+*.aab
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+.vscode/

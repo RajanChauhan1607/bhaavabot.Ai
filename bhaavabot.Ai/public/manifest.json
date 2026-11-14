@@ -1,0 +1,30 @@
+{
+  "name": "BhaavaBot — Your Calm Companion",
+  "short_name": "BhaavaBot",
+  "description": "A gentle, private space for emotional reflection, calming soundscapes, and empathetic companionship.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7faf8",
+  "theme_color": "#244e4e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/apple-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["health", "lifestyle", "wellness"]
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BhaavaBot</string>
+    <string name="title_activity_main">BhaavaBot</string>
+    <string name="package_name">com.bhaavabot.app</string>
+    <string name="custom_url_scheme">com.bhaavabot.app</string>
+</resources>
