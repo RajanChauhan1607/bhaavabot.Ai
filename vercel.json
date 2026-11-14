@@ -1,6 +1,0 @@
-{
-  "version": 2,
-  "buildCommand": "cd bhaavabot.Ai && npm install && npm run build",
-  "outputDirectory": "bhaavabot.Ai/.next",
-  "installCommand": "cd bhaavabot.Ai && npm install"
-}
