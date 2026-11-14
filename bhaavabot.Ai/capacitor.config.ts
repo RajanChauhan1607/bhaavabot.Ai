@@ -5,13 +5,13 @@ const config: CapacitorConfig = {
   appName: 'BhaavaBot',
   webDir: 'out',
   server: {
-    // Connects the Android app to your live Next.js dev server:
-    url: 'http://10.200.10.110:3000',
+    // Production Cloud URL - No computer or local server needed!
+    url: 'https://bhaavabot-ai-nx5t.vercel.app',
     androidScheme: 'https',
-    cleartext: true
+    cleartext: false
   },
   android: {
-    allowMixedContent: true
+    allowMixedContent: false
   }
 };
 
