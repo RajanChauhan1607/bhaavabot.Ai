@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'BhaavaBot',
   webDir: 'out',
   server: {
-    // Production Cloud URL - No computer or local server needed!
-    url: 'https://bhaavabot-ai-nx5t.vercel.app',
+    // Production Cloud URL
+    url: 'https://bhaavabot.vercel.app',
     androidScheme: 'https',
     cleartext: false
   },

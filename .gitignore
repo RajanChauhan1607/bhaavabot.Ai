@@ -36,3 +36,10 @@ bhaavabot.Ai/android/local.properties
 Thumbs.db
 *.log
 .vscode/
+
+# ── Git backup (temp) ─────────────────────────────────────────────────────────
+bhaavabot.Ai/.git_backup/
+
+# ── Capacitor build output ────────────────────────────────────────────────────
+bhaavabot.Ai/android/app/build/
+bhaavabot.Ai/android/.gradle/
