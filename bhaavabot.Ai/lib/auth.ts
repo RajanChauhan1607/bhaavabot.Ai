@@ -21,6 +21,20 @@ export const auth = betterAuth({
     : undefined,
   emailAndPassword: { enabled: true, autoSignIn: true },
   trustedOrigins: origins,
-  session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
-  ...(process.env.NODE_ENV === 'development' ? { advanced: { defaultCookieAttributes: { sameSite: 'lax' as const, secure: false } } } : {}),
+  session: {
+    expiresIn: 60 * 60 * 24 * 30, // 30 days persistent session
+    updateAge: 60 * 60 * 24,       // refresh every 24 hours
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 30,
+    },
+  },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: 'lax' as const,
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    },
+  },
 })
