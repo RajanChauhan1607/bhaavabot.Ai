@@ -1550,7 +1550,8 @@ export default function Page() {
     }
   }, [])
 
-  // Auto-scroll to show recent message and typing bar when opening chat or when messages update
+  // Auto-scroll to show recent message and typing bar when in chat,
+  // OR scroll smoothly to the very top when navigating to any other view (Home, Reflections, Resources, etc.)
   useEffect(() => {
     if (view === 'chat') {
       scrollToBottom('auto')
@@ -1559,6 +1560,10 @@ export default function Page() {
       return () => {
         clearTimeout(t1)
         clearTimeout(t2)
+      }
+    } else {
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'auto' })
       }
     }
   }, [view, activeConversationId, messages.length, thinking, scrollToBottom])
