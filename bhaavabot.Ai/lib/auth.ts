@@ -1,9 +1,15 @@
 import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
 
-const origins = process.env.NODE_ENV === 'development'
-  ? ['http://localhost:3000', ...['V0_RUNTIME_URL', 'V0_DEV_APP_URL', 'V0_BUILD_URL', 'V0_SANDBOX_URL'].map((key) => process.env[key]).filter((value): value is string => Boolean(value))]
-  : [process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '', process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : ''].filter(Boolean)
+const origins = [
+  'https://bhaavabot.vercel.app',
+  'http://localhost:3000',
+  'https://localhost',
+  'capacitor://localhost',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '',
+  process.env.BETTER_AUTH_URL || ''
+].filter(Boolean)
 
 const hasGoogleAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
 
