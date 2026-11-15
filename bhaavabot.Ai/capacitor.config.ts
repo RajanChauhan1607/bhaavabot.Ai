@@ -8,13 +8,7 @@ const config: CapacitorConfig = {
     // Production Cloud URL
     url: 'https://bhaavabot.vercel.app',
     androidScheme: 'https',
-    cleartext: false,
-    allowNavigation: [
-      'bhaavabot.vercel.app',
-      'accounts.google.com',
-      '*.google.com',
-      '*.googleusercontent.com'
-    ]
+    cleartext: false
   },
   android: {
     allowMixedContent: false
