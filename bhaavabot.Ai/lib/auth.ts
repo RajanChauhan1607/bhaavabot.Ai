@@ -11,6 +11,12 @@ export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET || 'bhaavabot-better-auth-secret-32-chars-long-key',
   baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ['google'],
+    },
+  },
   socialProviders: hasGoogleAuth
     ? {
         google: {
