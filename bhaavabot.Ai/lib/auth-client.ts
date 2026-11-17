@@ -21,37 +21,20 @@ export const authClient = {
     },
     google: async () => {
       try {
-        const callbackURL = typeof window !== 'undefined' && window.location.origin.includes('vercel.app')
-          ? 'https://bhaavabot.vercel.app'
-          : (typeof window !== 'undefined' ? window.location.origin : 'https://bhaavabot.vercel.app')
-
-        // Direct navigation to Google OAuth initiation endpoint
-        // This avoids popup blockers and WebView iframe interception issues
-        const signinEndpoint = `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'https://bhaavabot.vercel.app'}/api/auth/sign-in/social`
-        
-        const response = await fetch(signinEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            provider: 'google',
-            callbackURL,
-          }),
-        })
-
-        const data = await response.json()
-        if (data?.url) {
-          window.location.href = data.url
-          return { data: { url: data.url }, error: null }
-        }
-
-        // Fallback to client method
+        const callbackURL = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
         const res = await client.signIn.social({
           provider: 'google',
           callbackURL,
         })
         if (res?.error) {
           const msg = res.error.message || (res.error as any).statusText || ''
-          return { data: null, error: { message: msg || 'Failed to sign in with Google' } }
+          let friendly = msg || 'Failed to sign in with Google'
+          if (msg.includes('not found') || msg.includes('PROVIDER_NOT_FOUND') || msg.includes('CLIENT_ID') || msg.includes('missing')) {
+            friendly = 'Google OAuth keys are not configured properly in .env.local. Please check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.'
+          } else if (msg.toLowerCase().includes('password') || msg.toLowerCase().includes('authentication failed') || msg.toLowerCase().includes('database')) {
+            friendly = 'Database authentication failed. Please verify your Neon DATABASE_URL credentials.'
+          }
+          return { data: null, error: { message: friendly } }
         }
         return { data: res?.data, error: null }
       } catch (err: any) {
