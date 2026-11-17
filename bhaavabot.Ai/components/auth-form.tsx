@@ -52,6 +52,21 @@ export function AuthForm({
   const [success, setSuccess] = useState('')
   const [pending, setPending] = useState(false)
 
+  // Surface OAuth redirect errors (such as account_not_linked) clearly to the user
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const err = params.get('error')
+      if (err) {
+        if (err === 'account_not_linked') {
+          setError('An account with this email already exists using password. Please sign in with your email & password above, or sign up with a new email.')
+        } else {
+          setError(`Sign-in error: ${err}`)
+        }
+      }
+    }
+  }, [])
+
   const isSecretKeyConfigured = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.startsWith('sb_secret_')
 
   async function handleGoogleSignIn() {
