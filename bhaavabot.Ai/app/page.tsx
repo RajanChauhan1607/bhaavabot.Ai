@@ -2124,20 +2124,6 @@ export default function Page() {
                     aria-label="Message BhaavaBot"
                   />
                   <button
-                    className={`mic-button ${listening ? 'listening' : ''}`}
-                    onClick={() => {
-                      if (listening) {
-                        setListening(false)
-                      } else {
-                        setListening(true)
-                        showToast('Voice session active')
-                      }
-                    }}
-                    aria-label="Voice input"
-                  >
-                    <Mic />
-                  </button>
-                  <button
                     className="send-button"
                     onClick={() => handleSendMessage()}
                     aria-label="Send message"

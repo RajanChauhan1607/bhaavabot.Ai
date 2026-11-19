@@ -321,7 +321,7 @@ export function EmergencyContactModal({
               <input
                 id="emergency-name"
                 type="text"
-                placeholder="e.g. Dad (Rajan), Mom, Brother..."
+                placeholder="e.g. Mom, Brother, Friend..."
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -405,7 +405,7 @@ export function EmergencyContactModal({
               <input
                 id="emergency-phone"
                 type="tel"
-                placeholder="+91 98765 43210 or 7861079214"
+                placeholder="e.g. +91 98765 43210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 style={{

@@ -96,8 +96,8 @@ export function AuthForm({
     const password = String(formData.get('password') || '')
     const name = String(formData.get('name') || '').trim()
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
       setPending(false)
       return
     }
@@ -301,9 +301,9 @@ export function AuthForm({
           <input
             name="password"
             type="password"
-            minLength={6}
+            minLength={8}
             required
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
             autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
           />
         </label>
